@@ -23,6 +23,8 @@ namespace Bank
         public MainWindow()
         {
             InitializeComponent();
+            ClientTypeLB.ItemsSource = Enum.GetNames(typeof(ClientType)).ToList();
+            ClientTypeLB.SelectedIndex = 0; //default
         }
     }
 }

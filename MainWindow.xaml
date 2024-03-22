@@ -7,6 +7,28 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <StackPanel HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="229">
+            <Label Content="Тип клиента:" FontFamily="Arial" FontSize="14"/>
+            <ListBox x:Name="ClientTypeLB" Height="104"/>
+
+
+            <Label Content="Ввод нового клиента:" FontSize="14" FontFamily="Arial"/>
+            <Grid />
+            <Label Content="Полное Имя"/>
+            <TextBox x:Name="ClientNameInput" Height="23" TextWrapping="Wrap" Text=""/>
+            <Label Content="Накопления"/>
+            <TextBox x:Name="MoneySumInput" Height="23" TextWrapping="Wrap" Text=""/>
+            <CheckBox x:Name="CreditStoryStatusInput" Content="Хорошая кредитная история"/>
+            <CheckBox x:Name="CreditStatusInput" Content="Активен кредит"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Height="399" Margin="244,10,0,0" VerticalAlignment="Top" Width="223">
+            <Label Content="Список клиентов:" FontSize="14" FontFamily="Arial"/>
+            <ListBox x:Name="ClientList" Height="370"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Height="399" Margin="472,10,0,0" VerticalAlignment="Top" Width="310">
+            <Label Content="Информация о клиенте" FontSize="14" FontFamily="Arial"/>
+            <TextBlock TextWrapping="Wrap" Text="" Height="369"/>
+        </StackPanel>
+
     </Grid>
 </Window>
