@@ -8,7 +8,11 @@ namespace Bank
 {
     public class VIPClient : Client
     {
-            public override byte CreditRate { get; set; } = 6;
-            public override byte DepositRate { get; set; } = 9;
+        public VIPClient(string name, uint money) : base(name, money)
+        {
+        }
+        public override ClientType Type { get; set; } = ClientType.VIP;
+        public override byte CreditRate { get; set; } = 6;
+        public override byte DepositRate { get; set; } = 9;
     }
 }

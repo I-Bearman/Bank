@@ -9,7 +9,7 @@ namespace Bank
     public abstract class Client
     {
         public string Name { get; set; }
-        public ClientType Type { get; set; }
+        public abstract ClientType Type { get; set; }
         public uint Money { get; set; }
         public bool IsCredit { get; set; }
         public abstract byte CreditRate { get; set; }
@@ -19,12 +19,16 @@ namespace Bank
         public uint DepositSum { get; set; }
         public bool CreditStoryIsGood { get; set; }
 
-        public Client(string name = "Default Name", uint money = 0)
+        public Client()
+        {
+            Name = "Default Name";
+            Money = 0;
+        }
+
+        protected Client(string name, uint money)
         {
             Name = name;
             Money = money;
         }
-
-
     }
 }

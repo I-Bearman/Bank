@@ -15,14 +15,26 @@ namespace Bank
     internal class IndividBank : BankDepart
     {
         public override string Department { get; set; } = "Individual";
+        public IndividBank()
+        {
+            Clients = new List<Client>();
+        }
     }
     internal class BusinessBank : BankDepart
     {
         public override string Department { get; set; } = "Business";
+        public BusinessBank()
+        {
+            Clients = new List<Client>();
+        }
     }
     internal class VIPBank : BankDepart
     {
         public override string Department { get; set; } = "VIP";
+        public VIPBank()
+        {
+            Clients = new List<Client>();
+        }
     }
 
 }

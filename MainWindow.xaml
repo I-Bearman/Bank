@@ -9,7 +9,7 @@
     <Grid>
         <StackPanel HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="229">
             <Label Content="Тип клиента:" FontFamily="Arial" FontSize="14"/>
-            <ListBox x:Name="ClientTypeLB" Height="104"/>
+            <ListBox x:Name="ClientTypeLB" Height="104" SelectionChanged="ClientTypeLB_SelectionChanged"/>
 
 
             <Label Content="Ввод нового клиента:" FontSize="14" FontFamily="Arial"/>
@@ -19,15 +19,64 @@
             <Label Content="Накопления"/>
             <TextBox x:Name="MoneySumInput" Height="23" TextWrapping="Wrap" Text=""/>
             <CheckBox x:Name="CreditStoryStatusInput" Content="Хорошая кредитная история"/>
-            <CheckBox x:Name="CreditStatusInput" Content="Активен кредит"/>
+            <Button Content="Создать" Click="CreateNewClientButton_Click"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="399" Margin="244,10,0,0" VerticalAlignment="Top" Width="223">
             <Label Content="Список клиентов:" FontSize="14" FontFamily="Arial"/>
-            <ListBox x:Name="ClientList" Height="370"/>
+            <ListBox x:Name="ClientList" Height="370"  SelectionChanged="ClientList_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="399" Margin="472,10,0,0" VerticalAlignment="Top" Width="310">
             <Label Content="Информация о клиенте" FontSize="14" FontFamily="Arial"/>
-            <TextBlock TextWrapping="Wrap" Text="" Height="369"/>
+            <ListBox Grid.Row="2" Grid.Column="4" x:Name="ClientInfo" Height="369">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Имя Клиента: "/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Тип Клиента: "/>
+                                <TextBlock Text="{Binding Type}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Накопления: "/>
+                                <TextBlock Text="{Binding Money}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Хорошая кредитная история: "/>
+                                <TextBlock Text="{Binding CreditStoryIsGood}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Активен кредит: "/>
+                                <TextBlock Text="{Binding IsCredit}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Кредитная ставка (%): "/>
+                                <TextBlock Text="{Binding CreditRate}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Активен депозит: "/>
+                                <TextBlock Text="{Binding IsDeposit}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Депозитная ставка (%): "/>
+                                <TextBlock Text="{Binding DepositRate}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Проценты по депозиту: "/>
+                                <TextBlock Text="{Binding DepositSum}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
 
     </Grid>
