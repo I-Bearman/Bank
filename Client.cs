@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bank
+﻿namespace Bank
 {
     public abstract class Client
     {
@@ -17,13 +11,8 @@ namespace Bank
         public DepositType DepositType { get; set; }
         public abstract byte DepositRate { get; set; }
         public uint DepositSum { get; set; }
+        public string DepositInfo { get; set; }
         public bool CreditStoryIsGood { get; set; }
-
-        public Client()
-        {
-            Name = "Default Name";
-            Money = 0;
-        }
 
         protected Client(string name, uint money)
         {

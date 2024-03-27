@@ -21,18 +21,23 @@ namespace Bank
     public partial class MainWindow : Window
     {
         private Core core = new Core();
+        string pathToBase = "ClientBase.json";
         public MainWindow()
         {
             InitializeComponent();
             core.CreateBank();
+            //core.LoadBase(pathToBase);
             ClientTypeLB.ItemsSource = Enum.GetNames(typeof(ClientType)).ToList();
             ClientTypeLB.SelectedIndex = 0; //default
+            DepositTypeCB.ItemsSource = Enum.GetNames(typeof(DepositType)).Where(n => n != "None").ToList();
             ClientListReload();
         }
 
         private void ClientListReload()
         {
-            ClientList.ItemsSource = core.bank[ClientTypeLB.SelectedIndex].Clients;
+            List<Client> clients = core.bank[ClientTypeLB.SelectedIndex].Clients;
+            ClientList.ItemsSource = clients;
+            RecipientCB.ItemsSource = clients;
             ClientTypeLB.Items.Refresh();
         }
         private void ClientTypeLB_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -65,14 +70,77 @@ namespace Bank
                     default:
                         break;
                 }
-                MessageBox.Show("Клиент сохранён", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
                 ClientList.Items.Refresh();
+                RecipientCB.Items.Refresh();
             }
         }
 
         private void ClientList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ClientInfo.ItemsSource = ClientList.SelectedItems;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            core.SaveBase(pathToBase, core.bank);
+        }
+
+        private void GetCreditButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client senderC = ClientList.SelectedItem as Client;
+
+            //Содержит 2 проверки:
+            //- выбран ли клиент из списка
+            //- верное ли число введено в поле Суммы
+            if (senderC == null)
+                MessageBox.Show("Не Выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else
+            {
+                bool parseResult = uint.TryParse(CreditSumTB.Text, out uint resultSum);
+                if (!parseResult)
+                    MessageBox.Show("Введите целочисленную положительную сумму кредита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else
+                {
+                    core.GetCredit(senderC, resultSum);
+                    ClientInfo.Items.Refresh();
+                    MessageBox.Show("Кредит выдан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+        }
+
+        private void TransferButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client senderC = ClientList.SelectedItem as Client;
+            Client recipient = RecipientCB.SelectedItem as Client;
+     
+            if (senderC == recipient)
+                MessageBox.Show("Клиент не может сделать перевод самому себе", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else
+            {
+                //Содержит 4 проверки последовательно:
+                //- выбран ли клиент из списка
+                //- выбран ли получатель из комбобокса
+                //- верное ли число введено в поле Суммы
+                //- у клиента достаточно денег для перевода
+                if (senderC == null)
+                    MessageBox.Show("Не Выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else if (recipient == null)
+                    MessageBox.Show("Не Выбран получатель трансфера", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else
+                {
+                    bool parseResult = uint.TryParse(TransSumTB.Text, out uint resultSum);
+                    if (!parseResult)
+                        MessageBox.Show("Введите целочисленную положительную сумму трансфера", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    else if (!core.CheckEnoughSum(senderC, resultSum))
+                        MessageBox.Show("Клиент не имеет нужной суммы", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    else
+                    {
+                        core.Transfer(senderC, recipient, resultSum);
+                        ClientInfo.Items.Refresh();
+                        MessageBox.Show("Трансфер произведён", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
         }
     }
 }

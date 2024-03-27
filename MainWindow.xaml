@@ -5,35 +5,64 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bank"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Closing="Window_Closing">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="229">
             <Label Content="Тип клиента:" FontFamily="Arial" FontSize="14"/>
-            <ListBox x:Name="ClientTypeLB" Height="104" SelectionChanged="ClientTypeLB_SelectionChanged"/>
-
-
-            <Label Content="Ввод нового клиента:" FontSize="14" FontFamily="Arial"/>
-            <Grid />
+            <ListBox x:Name="ClientTypeLB" Height="94" SelectionChanged="ClientTypeLB_SelectionChanged"/>
+            <Label Content="Ввод нового клиента:" FontSize="14" FontFamily="Arial" Margin="0,10,0,0"/>
             <Label Content="Полное Имя"/>
             <TextBox x:Name="ClientNameInput" Height="23" TextWrapping="Wrap" Text=""/>
             <Label Content="Накопления"/>
             <TextBox x:Name="MoneySumInput" Height="23" TextWrapping="Wrap" Text=""/>
             <CheckBox x:Name="CreditStoryStatusInput" Content="Хорошая кредитная история"/>
             <Button Content="Создать" Click="CreateNewClientButton_Click"/>
+            <Label Content="Принять депозит:" FontSize="14" FontFamily="Arial" Margin="0,10,0,0"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Тип:"/>
+                <ComboBox x:Name="DepositTypeCB" Width="187"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Сумма:"/>
+                <TextBox x:Name="DepositSumTB" Width="171"/>
+            </StackPanel>
+            <Button Content="Принять" Click="GetCreditButton_Click"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="399" Margin="244,10,0,0" VerticalAlignment="Top" Width="223">
             <Label Content="Список клиентов:" FontSize="14" FontFamily="Arial"/>
-            <ListBox x:Name="ClientList" Height="370"  SelectionChanged="ClientList_SelectionChanged">
+            <ListBox x:Name="ClientList" Height="181"  SelectionChanged="ClientList_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <Label Content="Выдать кредит:" FontSize="14" FontFamily="Arial" Margin="0,10,0,0"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Сумма:"/>
+                <TextBox x:Name="CreditSumTB" Width="171"/>
+            </StackPanel>
+            <Button Content="Выдать" Click="GetCreditButton_Click"/>
+            <Label Content="Произвести трансфер:" FontSize="14" FontFamily="Arial" Margin="0,10,0,0"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Получатель:"/>
+                <ComboBox x:Name="RecipientCB" Width="144">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Сумма:"/>
+                <TextBox x:Name="TransSumTB" Width="171"/>
+            </StackPanel>
+            <Button Content="Произвести" Click="TransferButton_Click"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="399" Margin="472,10,0,0" VerticalAlignment="Top" Width="310">
             <Label Content="Информация о клиенте" FontSize="14" FontFamily="Arial"/>
-            <ListBox Grid.Row="2" Grid.Column="4" x:Name="ClientInfo" Height="369">
+            <ListBox x:Name="ClientInfo" Height="369">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -66,11 +95,15 @@
                                 <TextBlock Text="{Binding IsDeposit}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Вид депозита: "/>
+                                <TextBlock Text="{Binding DepositType}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Депозитная ставка (%): "/>
                                 <TextBlock Text="{Binding DepositRate}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Проценты по депозиту: "/>
+                                <TextBlock Text="Сумма депозита: "/>
                                 <TextBlock Text="{Binding DepositSum}"/>
                             </StackPanel>
                         </StackPanel>
