@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Bank
 {
@@ -20,8 +11,8 @@ namespace Bank
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Core core = new Core();
-        string pathToBase = "ClientBase.json";
+        private readonly Core core = new Core();
+        readonly string pathToBase = "ClientBase.json";
         public MainWindow()
         {
             InitializeComponent();
@@ -44,7 +35,6 @@ namespace Bank
         {
             ClientListReload();
         }
-
 
         private void CreateNewClientButton_Click(object sender, RoutedEventArgs e)
         {
@@ -85,7 +75,7 @@ namespace Bank
             core.SaveBase(pathToBase, core.bank);
         }
 
-        private void GetCreditButton_Click(object sender, RoutedEventArgs e)
+        private void GiveCreditButton_Click(object sender, RoutedEventArgs e)
         {
             Client senderC = ClientList.SelectedItem as Client;
 
@@ -101,7 +91,7 @@ namespace Bank
                     MessageBox.Show("Введите целочисленную положительную сумму кредита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 else
                 {
-                    core.GetCredit(senderC, resultSum);
+                    core.GiveCredit(senderC, resultSum);
                     ClientInfo.Items.Refresh();
                     MessageBox.Show("Кредит выдан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -112,7 +102,7 @@ namespace Bank
         {
             Client senderC = ClientList.SelectedItem as Client;
             Client recipient = RecipientCB.SelectedItem as Client;
-     
+
             if (senderC == recipient)
                 MessageBox.Show("Клиент не может сделать перевод самому себе", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             else
@@ -140,6 +130,71 @@ namespace Bank
                         MessageBox.Show("Трансфер произведён", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
+            }
+        }
+
+        private void GetDepositButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client client = ClientList.SelectedItem as Client;
+
+            //Содержит 4 проверки последовательно:
+            //- выбран ли клиент из списка
+            //- выбран ли тип депозита из комбобокса
+            //- верное ли число введено в поле Суммы
+            //- у клиента достаточно денег для перевода
+            if (client == null)
+                MessageBox.Show("Не выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else if (DepositTypeCB.SelectedIndex == -1)
+                MessageBox.Show("Выберите тип депозита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else
+            {
+                bool result = uint.TryParse(DepositSumTB.Text, out uint depositSum);
+                if (!result)
+                    MessageBox.Show("Введите целочисленную положительную сумму депозита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else if (!core.CheckEnoughSum(client, depositSum))
+                    MessageBox.Show("У клиента недостаточно средств", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else
+                {
+                    DepositType depositType = (DepositType)Enum.Parse(typeof(DepositType), DepositTypeCB.SelectedItem.ToString());
+                    if (depositType == DepositType.Simple)
+                        core.MakeSimpleDeposit(client, depositSum);
+                    else
+                        core.MakeCapitalisedDeposit(client, depositSum);
+                    ClientInfo.Items.Refresh();
+                    MessageBox.Show("Депозит принят", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+        }
+
+        private void CloseDepositButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client client = ClientList.SelectedItem as Client;
+            if (client == null)
+                MessageBox.Show("Не выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else if (!client.IsDeposit)
+                MessageBox.Show("У клиента нет депозита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else
+            {
+                core.CloseDeposit(client);
+                ClientInfo.Items.Refresh();
+                MessageBox.Show("Депозит закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void CloseCreditButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client client = ClientList.SelectedItem as Client;
+            if (client == null)
+                MessageBox.Show("Не выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else if (!client.IsCredit)
+                MessageBox.Show("У клиента нет кредита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else if (!core.CheckEnoughSum(client, client.CreditSum))
+                MessageBox.Show("Клиент не имеет нужной суммы", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else
+            {
+                core.CloseCredit(client);
+                ClientInfo.Items.Refresh();
+                MessageBox.Show("Кредит закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

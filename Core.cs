@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Bank
@@ -21,12 +18,20 @@ namespace Bank
                 new VIPBank()
             };
         }
-
+        /// <summary>
+        /// Сохранение базы клиентов
+        /// </summary>
+        /// <param name="pathToBase">путь к базе</param>
+        /// <param name="bank">коллекция клиентов</param>
         public void SaveBase(string pathToBase, List<BankDepart> bank)
         {
             string json = JsonConvert.SerializeObject(bank);
             File.WriteAllText(pathToBase, json);
         }
+        /// <summary>
+        /// загрузка базы клиентов
+        /// </summary>
+        /// <param name="pathToBase">путь к базе</param>
         public void LoadBase(string pathToBase)
         {
             if (File.Exists(pathToBase))
@@ -35,7 +40,12 @@ namespace Bank
                 bank = JsonConvert.DeserializeObject(json) as List<BankDepart>;
             }
         }
-
+        /// <summary>
+        /// Создание простого клиента
+        /// </summary>
+        /// <param name="name">полное имя клиента</param>
+        /// <param name="money">накопления клиента</param>
+        /// <param name="creditStoreISGood">статус хорошей кредитной истории</param>
         public void CreateIndividClient(string name, uint money, bool creditStoreISGood)
         {
             Client client = new IndividClient(name, money);
@@ -43,6 +53,12 @@ namespace Bank
                 GoodCreditStorySetup(client);
             bank[(int)ClientType.Individual].Clients.Add(client);
         }
+        /// <summary>
+        /// Создание бизнес клиента
+        /// </summary>
+        /// <param name="name">полное имя клиента</param>
+        /// <param name="money">накопления клиента</param>
+        /// <param name="creditStoreISGood">статус хорошей кредитной истории</param>
         public void CreateBusinessClient(string name, uint money, bool creditStoreISGood)
         {
             Client client = new BusinessClient(name, money);
@@ -50,6 +66,12 @@ namespace Bank
                 GoodCreditStorySetup(client);
             bank[(int)ClientType.Business].Clients.Add(client);
         }
+        /// <summary>
+        /// Создание VIP клиента
+        /// </summary>
+        /// <param name="name">полное имя клиента</param>
+        /// <param name="money">накопления клиента</param>
+        /// <param name="creditStoreISGood">статус хорошей кредитной истории</param>
         public void CreateVIPClient(string name, uint money, bool creditStoreISGood)
         {
             Client client = new VIPClient(name, money);
@@ -57,6 +79,11 @@ namespace Bank
                 GoodCreditStorySetup(client);
             bank[(int)ClientType.VIP].Clients.Add(client);
         }
+        /// <summary>
+        /// Приведение параметров клиента к статусу хорошей кред. истории
+        /// </summary>
+        /// <param name="client">клиент, над которым совершается операция</param>
+        /// <returns></returns>
         private Client GoodCreditStorySetup(Client client)
         {
             client.CreditStoryIsGood = true;
@@ -64,45 +91,104 @@ namespace Bank
             client.DepositRate += 3;
             return client;
         }
+        /// <summary>
+        /// Метод проверки достаточности денег для совершения операции
+        /// </summary>
+        /// <param name="client">клиент, у которого проверяется количество</param>
+        /// <param name="checkSum">сумма планируемой операции</param>
+        /// <returns></returns>
         public bool CheckEnoughSum(Client client, uint checkSum)
         {
             bool result = client.Money >= checkSum;
             return result;
         }
-        public void GetCredit(Client client, uint creditSum)
+        /// <summary>
+        /// Метод выдачи кредита
+        /// </summary>
+        /// <param name="client">клиент, которому выдаётся кредит</param>
+        /// <param name="creditSum">сумма кредита</param>
+        public void GiveCredit(Client client, uint creditSum)
         {
+            client.CreditSum += creditSum;
             client.Money += creditSum;
             client.IsCredit = true;
         }
+        /// <summary>
+        /// Метод закрытия кредита
+        /// </summary>
+        /// <param name="client">клиент</param>
+        public void CloseCredit(Client client)
+        {
+            uint creditSum = client.CreditSum;
+            client.CreditSum = 0;
+            client.Money -= creditSum;
+            client.IsCredit = false;
+        }
+        /// <summary>
+        /// Метод перевода денег между клиентами
+        /// </summary>
+        /// <param name="sender">отправитель</param>
+        /// <param name="recipient">получатель</param>
+        /// <param name="transSum">сумма перевода</param>
         public void Transfer(Client sender, Client recipient, uint transSum)
         {
             sender.Money -= transSum;
             recipient.Money += transSum;
         }
-        public void MakeSimpleDeposit(Client client, uint DepositSum)
+        /// <summary>
+        /// Метод создания простого депозита
+        /// </summary>
+        /// <param name="client">клиент</param>
+        /// <param name="depositSum">сумма депозита</param>
+        public void MakeSimpleDeposit(Client client, uint depositSum)
         {
-            client.Money -= DepositSum;
+            client.Money -= depositSum;
             client.DepositType = DepositType.Simple;
             client.IsDeposit = true;
-            client.DepositSum += DepositSum;
+            client.DepositSum += depositSum;
+            DepositInfo(client);
         }
-        public void MakeCapitalisedDeposit(Client client, uint DepositSum)
+        /// <summary>
+        /// Метод создания депозита с капитализацией
+        /// </summary>
+        /// <param name="client">клиент</param>
+        /// <param name="depositSum">сумма депозита</param>
+        public void MakeCapitalisedDeposit(Client client, uint depositSum)
         {
-            client.Money -= DepositSum;
+            client.Money -= depositSum;
             client.DepositType = DepositType.Capitalisation;
             client.IsDeposit = true;
-            client.DepositSum += DepositSum;
+            client.DepositSum += depositSum;
+            DepositInfo(client);
         }
-
-        public string DepositInfo(Client client)
+        /// <summary>
+        /// Метод закрытия депозита
+        /// </summary>
+        /// <param name="client">клиент</param>
+        public void CloseDeposit(Client client)
         {
             uint depositSum = client.DepositSum;
-            int depositRate = client.DepositRate;
+            client.Money += depositSum;
+            client.DepositType = DepositType.None;
+            client.IsDeposit = false;
+            client.DepositSum = 0;
+            client.DepositInfo = string.Empty;
+        }
+        /// <summary>
+        /// Расчёт ежемесячного дохода от депозита и формирование строки инфо
+        /// </summary>
+        /// <param name="client">клиент</param>
+        /// <returns></returns>
+        public void DepositInfo(Client client)
+        {
+            float depositSum = client.DepositSum;
+            float depositRate = client.DepositRate;
             float[] months = new float[12];
+            string infoString = "Ежемесячный расчёт депозита:\n";
 
             months[0] = depositSum + (depositSum * depositRate / 100 / 12);
             months[0] = (float)Math.Round(months[0], 2);
-            string infoString = $"1 месяц: {months[0]}\n";
+            infoString += $"1 месяц: {months[0]}\n";
 
             //Простой депозит
             if (client.DepositType == DepositType.Simple)
@@ -124,11 +210,7 @@ namespace Bank
                     infoString += $"{i + 1} месяц: {months[i]}\n";
                 }
             }
-            return infoString;
+            client.DepositInfo = infoString;
         }
-
-
-
-
     }
 }
