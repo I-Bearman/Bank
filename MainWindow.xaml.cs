@@ -12,7 +12,7 @@ namespace Bank
     public partial class MainWindow : Window
     {
         private readonly Core core = new Core();
-        readonly string pathToBase = "ClientBase.json";
+        readonly string pathToBase = "ClientBase.xml";
         public MainWindow()
         {
             InitializeComponent();
