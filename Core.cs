@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Bank
@@ -8,6 +9,7 @@ namespace Bank
     class Core
     {
         public List<BankDepart> bank;
+        public event Action<string> Transaction;
 
         public void CreateBank()
         {
@@ -25,7 +27,9 @@ namespace Bank
         /// <param name="bank">коллекция клиентов</param>
         public void SaveBase(string pathToBase, List<BankDepart> bank)
         {
-            string json = JsonConvert.SerializeObject(bank);
+            string json = JsonConvert.SerializeObject(bank[(int)ClientType.Individual].Clients) + "\n";
+            json += JsonConvert.SerializeObject(bank[(int)ClientType.Business].Clients) + "\n";
+            json += JsonConvert.SerializeObject(bank[(int)ClientType.VIP].Clients);
             File.WriteAllText(pathToBase, json);
         }
         /// <summary>
@@ -36,8 +40,16 @@ namespace Bank
         {
             if (File.Exists(pathToBase))
             {
-                string json = File.ReadAllText(pathToBase);
-                bank = JsonConvert.DeserializeObject(json) as List<BankDepart>;
+                string[] json = File.ReadAllLines(pathToBase);
+
+                IEnumerable<Client> clients = JsonConvert.DeserializeObject<List<IndividClient>>(json[0]);
+                bank[(int)ClientType.Individual].Clients = clients.ToList();
+
+                clients = JsonConvert.DeserializeObject<List<BusinessClient>>(json[1]);
+                bank[(int)ClientType.Business].Clients = clients.ToList();
+
+                clients = JsonConvert.DeserializeObject<List<VIPClient>>(json[2]);
+                bank[(int)ClientType.VIP].Clients = clients.ToList();
             }
         }
         /// <summary>
@@ -111,7 +123,13 @@ namespace Bank
         {
             client.CreditSum += creditSum;
             client.Money += creditSum;
-            client.IsCredit = true;
+            if (client.IsCredit)
+                Transaction?.Invoke($"Клиент {client.Name} увеличил кредит на сумму {creditSum}");
+            else
+            {
+                client.IsCredit = true;
+                Transaction?.Invoke($"Кредит выдан клиенту {client.Name} на сумму {creditSum} под {client.CreditRate}% годовых");
+            }
         }
         /// <summary>
         /// Метод закрытия кредита
@@ -123,6 +141,7 @@ namespace Bank
             client.CreditSum = 0;
             client.Money -= creditSum;
             client.IsCredit = false;
+            Transaction?.Invoke($"Клиент {client.Name} погасил кредит");
         }
         /// <summary>
         /// Метод перевода денег между клиентами
@@ -134,6 +153,7 @@ namespace Bank
         {
             sender.Money -= transSum;
             recipient.Money += transSum;
+            Transaction?.Invoke($"Произведён перевод между {sender} и {recipient} на сумму {transSum}");
         }
         /// <summary>
         /// Метод создания простого депозита
@@ -144,8 +164,14 @@ namespace Bank
         {
             client.Money -= depositSum;
             client.DepositType = DepositType.Simple;
-            client.IsDeposit = true;
             client.DepositSum += depositSum;
+            if (client.IsDeposit)
+                Transaction?.Invoke($"Клиент {client.Name} пополнил депозит на сумму {depositSum}");
+            else
+            {
+                client.IsDeposit = true;
+                Transaction?.Invoke($"Клиент {client.Name} внёс депозит на сумму {depositSum} под {client.DepositRate}% годовых");
+            }
             DepositInfo(client);
         }
         /// <summary>
@@ -157,8 +183,14 @@ namespace Bank
         {
             client.Money -= depositSum;
             client.DepositType = DepositType.Capitalisation;
-            client.IsDeposit = true;
             client.DepositSum += depositSum;
+            if (client.IsDeposit)
+                Transaction?.Invoke($"Клиент {client.Name} пополнил депозит на сумму {depositSum}");
+            else
+            {
+                client.IsDeposit = true;
+                Transaction?.Invoke($"Клиент {client.Name} внёс депозит на сумму {depositSum} под {client.DepositRate}% годовых с капитализацией");
+            }
             DepositInfo(client);
         }
         /// <summary>
@@ -173,6 +205,7 @@ namespace Bank
             client.IsDeposit = false;
             client.DepositSum = 0;
             client.DepositInfo = string.Empty;
+            Transaction?.Invoke($"Клиент {client.Name} закрыл депозит");
         }
         /// <summary>
         /// Расчёт ежемесячного дохода от депозита и формирование строки инфо

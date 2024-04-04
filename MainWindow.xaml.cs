@@ -13,17 +13,26 @@ namespace Bank
     {
         private readonly Core core = new Core();
         readonly string pathToBase = "ClientBase.json";
+        private List<string> logList = new List<string>();
+
         public MainWindow()
         {
             InitializeComponent();
             core.CreateBank();
-            //core.LoadBase(pathToBase);
+            core.LoadBase(pathToBase);
             ClientTypeLB.ItemsSource = Enum.GetNames(typeof(ClientType)).ToList();
             ClientTypeLB.SelectedIndex = 0; //default
             DepositTypeCB.ItemsSource = Enum.GetNames(typeof(DepositType)).Where(n => n != "None").ToList();
             ClientListReload();
-        }
 
+            core.Transaction += TransactionEvent;
+            TransactionList.ItemsSource = logList;
+        }
+        private void TransactionEvent(string message)
+        {
+            logList.Add(message);
+            TransactionList.Items.Refresh();
+        }
         private void ClientListReload()
         {
             List<Client> clients = core.bank[ClientTypeLB.SelectedIndex].Clients;

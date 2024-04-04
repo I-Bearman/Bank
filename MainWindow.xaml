@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bank"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="800" Closing="Window_Closing">
+        Title="MainWindow" Height="500" Width="1126.02" Closing="Window_Closing">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Height="449" Margin="10,10,0,0" VerticalAlignment="Top" Width="229">
             <Label Content="Тип клиента:" FontFamily="Arial" FontSize="14"/>
@@ -64,7 +64,7 @@
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="449" Margin="472,10,0,0" VerticalAlignment="Top" Width="310">
             <Label Content="Информация о клиенте" FontSize="14" FontFamily="Arial"/>
-            <ListBox x:Name="ClientInfo" Height="418">
+            <ListBox x:Name="ClientInfo" Height="421">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -118,6 +118,9 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
-
+        <StackPanel HorizontalAlignment="Left" Height="449" Margin="787,10,0,0" VerticalAlignment="Top" Width="321">
+            <Label Content="Транзакции:" FontSize="14" FontFamily="Arial"/>
+            <ListBox x:Name="TransactionList" Height="430"/>
+        </StackPanel>
     </Grid>
 </Window>
