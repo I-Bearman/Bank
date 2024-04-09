@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using CoreLibrary;
+using CollectionsLibrary;
 
 namespace Bank
 {
@@ -69,6 +71,11 @@ namespace Bank
                     default:
                         break;
                 }
+
+                ClientNameInput.Text = string.Empty;
+                MoneySumInput.Text = string.Empty;
+                CreditStoryStatusInput.IsChecked = false;
+
                 ClientList.Items.Refresh();
                 RecipientCB.Items.Refresh();
             }

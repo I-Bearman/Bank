@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using CollectionsLibrary;
+using System.IO;
 
-namespace Bank
+namespace CoreLibrary
 {
-    class Core
+    public class Core
     {
         public List<BankDepart> bank;
         public event Action<string> Transaction;

@@ -1,4 +1,4 @@
-﻿namespace Bank
+﻿namespace CollectionsLibrary
 {
     public abstract class Client
     {

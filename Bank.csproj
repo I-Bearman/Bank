@@ -66,13 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BankDepart.cs" />
-    <Compile Include="VIPClient.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="BusinessClient.cs" />
-    <Compile Include="IndividClient.cs" />
-    <Compile Include="Types.cs" />
-    <Compile Include="Client.cs" />
+    <Compile Include="BankExceptions.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -104,6 +98,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="CollectionsLibrary\CollectionsLibrary.csproj">
+      <Project>{f420ab46-44ff-42b2-b201-f1165d9a1bb6}</Project>
+      <Name>CollectionsLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="CoreLibrary\CoreLibrary.csproj">
+      <Project>{e070877d-cefb-474c-a8ea-2a448b288224}</Project>
+      <Name>CoreLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

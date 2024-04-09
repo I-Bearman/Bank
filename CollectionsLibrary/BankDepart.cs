@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Bank
+namespace CollectionsLibrary
 {
     public abstract class BankDepart
     {
@@ -8,7 +8,7 @@ namespace Bank
         public abstract string Department { get; set; }
     }
 
-    internal class IndividBank : BankDepart
+    public class IndividBank : BankDepart
     {
         public override string Department { get; set; } = "Individual";
         public IndividBank()
@@ -16,7 +16,7 @@ namespace Bank
             Clients = new List<Client>();
         }
     }
-    internal class BusinessBank : BankDepart
+    public class BusinessBank : BankDepart
     {
         public override string Department { get; set; } = "Business";
         public BusinessBank()
@@ -24,7 +24,7 @@ namespace Bank
             Clients = new List<Client>();
         }
     }
-    internal class VIPBank : BankDepart
+    public class VIPBank : BankDepart
     {
         public override string Department { get; set; } = "VIP";
         public VIPBank()
