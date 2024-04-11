@@ -105,17 +105,6 @@ namespace CoreLibrary
             return client;
         }
         /// <summary>
-        /// Метод проверки достаточности денег для совершения операции
-        /// </summary>
-        /// <param name="client">клиент, у которого проверяется количество</param>
-        /// <param name="checkSum">сумма планируемой операции</param>
-        /// <returns></returns>
-        public bool CheckEnoughSum(Client client, uint checkSum)
-        {
-            bool result = client.Money >= checkSum;
-            return result;
-        }
-        /// <summary>
         /// Метод выдачи кредита
         /// </summary>
         /// <param name="client">клиент, которому выдаётся кредит</param>
@@ -212,7 +201,6 @@ namespace CoreLibrary
         /// Расчёт ежемесячного дохода от депозита и формирование строки инфо
         /// </summary>
         /// <param name="client">клиент</param>
-        /// <returns></returns>
         public void DepositInfo(Client client)
         {
             float depositSum = client.DepositSum;
@@ -245,6 +233,33 @@ namespace CoreLibrary
                 }
             }
             client.DepositInfo = infoString;
+        }
+    }
+    public static class Ext
+    {
+        /// <summary>
+        /// Попытка преобразовать строку в целочисленное положительное число
+        /// </summary>
+        /// <param name="str">вводная строка</param>
+        /// <returns>искомое целочисленное положительное число</returns>
+        static public uint TryParse(this string str)
+        {
+            bool boolRes = uint.TryParse(str, out uint resultSum);
+            if (!boolRes)
+                throw new UncorrectSumWriteException("Введите целочисленную положительную сумму операции");
+            return resultSum;
+        }
+
+        /// <summary>
+        /// Метод проверки достаточности денег для совершения операции
+        /// </summary>
+        /// <param name="client">клиент, у которого проверяется количество</param>
+        /// <param name="checkSum">сумма планируемой операции</param>
+        static public void CheckEnoughSum(this Client client, uint checkSum)
+        {
+            bool result = client.Money >= checkSum;
+            if (!result)
+                throw new DontEnoughSumException("Клиент не имеет нужной суммы");
         }
     }
 }

@@ -102,17 +102,23 @@ namespace Bank
                 MessageBox.Show("Не Выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             else
             {
-                bool parseResult = uint.TryParse(CreditSumTB.Text, out uint resultSum);
-                if (!parseResult)
-                    MessageBox.Show("Введите целочисленную положительную сумму кредита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                else
+                uint resultSum;
+                try
                 {
-                    core.GiveCredit(senderC, resultSum);
-                    ClientInfo.Items.Refresh();
-                    MessageBox.Show("Кредит выдан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    resultSum = CreditSumTB.Text.TryParse();
                 }
+                catch (UncorrectSumWriteException ex)
+                {
+                    MessageBox.Show(ex.Message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                core.GiveCredit(senderC, resultSum);
+                ClientInfo.Items.Refresh();
+                MessageBox.Show("Кредит выдан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
             }
         }
+
 
         private void TransferButton_Click(object sender, RoutedEventArgs e)
         {
@@ -134,17 +140,26 @@ namespace Bank
                     MessageBox.Show("Не Выбран получатель трансфера", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 else
                 {
-                    bool parseResult = uint.TryParse(TransSumTB.Text, out uint resultSum);
-                    if (!parseResult)
-                        MessageBox.Show("Введите целочисленную положительную сумму трансфера", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    else if (!core.CheckEnoughSum(senderC, resultSum))
-                        MessageBox.Show("Клиент не имеет нужной суммы", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    else
+                    uint resultSum;
+                    try
                     {
-                        core.Transfer(senderC, recipient, resultSum);
-                        ClientInfo.Items.Refresh();
-                        MessageBox.Show("Трансфер произведён", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        resultSum = TransSumTB.Text.TryParse();
+                        senderC.CheckEnoughSum(resultSum);
                     }
+                    catch (UncorrectSumWriteException ex)
+                    {
+                        MessageBox.Show(ex.Message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    catch (DontEnoughSumException ex)
+                    {
+                        MessageBox.Show(ex.Message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    core.Transfer(senderC, recipient, resultSum);
+                    ClientInfo.Items.Refresh();
+                    MessageBox.Show("Трансфер произведён", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
                 }
             }
         }
@@ -164,21 +179,30 @@ namespace Bank
                 MessageBox.Show("Выберите тип депозита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             else
             {
-                bool result = uint.TryParse(DepositSumTB.Text, out uint depositSum);
-                if (!result)
-                    MessageBox.Show("Введите целочисленную положительную сумму депозита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                else if (!core.CheckEnoughSum(client, depositSum))
-                    MessageBox.Show("У клиента недостаточно средств", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                else
+                uint depositSum;
+                try
                 {
-                    DepositType depositType = (DepositType)Enum.Parse(typeof(DepositType), DepositTypeCB.SelectedItem.ToString());
-                    if (depositType == DepositType.Simple)
-                        core.MakeSimpleDeposit(client, depositSum);
-                    else
-                        core.MakeCapitalisedDeposit(client, depositSum);
-                    ClientInfo.Items.Refresh();
-                    MessageBox.Show("Депозит принят", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    depositSum = DepositSumTB.Text.TryParse();
+                    client.CheckEnoughSum(depositSum);
                 }
+                catch (UncorrectSumWriteException ex)
+                {
+                    MessageBox.Show(ex.Message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                catch (DontEnoughSumException ex)
+                {
+                    MessageBox.Show(ex.Message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                DepositType depositType = (DepositType)Enum.Parse(typeof(DepositType), DepositTypeCB.SelectedItem.ToString());
+                if (depositType == DepositType.Simple)
+                    core.MakeSimpleDeposit(client, depositSum);
+                else
+                    core.MakeCapitalisedDeposit(client, depositSum);
+                ClientInfo.Items.Refresh();
+                MessageBox.Show("Депозит принят", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
             }
         }
 
@@ -204,14 +228,19 @@ namespace Bank
                 MessageBox.Show("Не выбран клиент из списка", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             else if (!client.IsCredit)
                 MessageBox.Show("У клиента нет кредита", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-            else if (!core.CheckEnoughSum(client, client.CreditSum))
-                MessageBox.Show("Клиент не имеет нужной суммы", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             else
-            {
-                core.CloseCredit(client);
-                ClientInfo.Items.Refresh();
-                MessageBox.Show("Кредит закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+                try
+                {
+                    client.CheckEnoughSum(client.CreditSum);
+                }
+                catch (DontEnoughSumException ex)
+                {
+                    MessageBox.Show(ex.Message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            core.CloseCredit(client);
+            ClientInfo.Items.Refresh();
+            MessageBox.Show("Кредит закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
